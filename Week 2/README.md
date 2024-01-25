@@ -73,8 +73,10 @@ Task 1.3:
 - ECB and CBC introduce additional blocks for padding, making the ciphertext longer than the plaintext.
 - CTR does not introduce additional blocks, so the ciphertext length is the same as the plaintext length.
 
+----
+### Task 2: Key generation
 
-Task 2.1
+Task 2.1.1
 
 The comparison of the results and the time taken for RSA key generation using OpenSSL's genrsa and genpkey commands reveals some differences:
 
@@ -100,3 +102,54 @@ Conclusion:
 
 The choice between genrsa and genpkey depends on specific requirements. If the key generation time is a critical factor and an encrypted private key is not needed, the legacy genrsa command might be preferred.
 If enhanced security features such as encrypted private keys are required, the newer genpkey command is a suitable choice.
+
+For ECDSA, Here are some observations
+1. ECDSA (secp256r1):
+
+- The private key is generated using the secp256r1 elliptic curve.
+- The public key is derived from the private key.
+  
+2. EdDSA (Ed25519):
+
+- The private key is generated using the Ed25519 elliptic curve.
+- The public key is derived from the private key.
+  
+Comparison:
+
+- Both ECDSA and EdDSA are elliptic curve digital signature algorithms, but they use different elliptic curves (secp256r1 for ECDSA and Ed25519 for EdDSA).
+- Ed25519 is generally considered more secure and efficient than many other signature algorithms, including secp256r1. It provides strong security with shorter key lengths.
+- The key generation times for both algorithms are relatively fast, with EdDSA (Ed25519) being slightly faster in this case.
+It's important to note that the choice between ECDSA and EdDSA may depend on specific use cases, security considerations, and compatibility requirements. In practice, Ed25519 is often preferred due to its security properties and efficiency.
+
+Task 2.1.2
+- Legacy (genrsa): ``time openssl genrsa -out private_rsa_key_legacy.pem 4096``
+- Newer (genpkey): ``time openssl genpkey -algorithm RSA -out private_rsa_key_new.pem -aes256``
+
+Task 2.1.3
+
+The curves secp256r1 (used in ECDSA) and Curve25519 (used in EdDSA) are different elliptic curves with distinct properties. Here are some practical differences between them:
+
+1. Curve Shape:
+
+- secp256r1: It is a NIST elliptic curve with a 256-bit prime modulus. The curve is defined over a prime field.
+- Curve25519: It is a Montgomery curve with a prime order of 2^255 - 19. The curve is designed to be efficient and secure, particularly for use in cryptographic protocols.
+
+2. Efficiency:
+
+- secp256r1: ECDSA with secp256r1 requires more computational resources compared to EdDSA with Curve25519. The operations on prime fields (common in ECDSA) can be more computationally expensive.
+- Curve25519: It is designed to be efficient, especially on devices with limited resources. The curve's structure allows for faster computations.
+  
+3. Security:
+
+- secp256r1: It is considered secure and has been widely used in practice. However, concerns have been raised about the NIST curves and their potential vulnerabilities to certain types of attacks.
+- Curve25519: It is designed to offer a high level of security. The curve's structure and choice of parameters aim to mitigate potential vulnerabilities found in other curves.
+
+4.Ease of Implementation:
+
+- secp256r1: Implementing ECDSA with secp256r1 involves more complex arithmetic operations on prime fields.
+- Curve25519: Implementing EdDSA with Curve25519 is often considered more straightforward due to the curve's specific structure, making it suitable for various platforms.
+
+5. Performance:
+
+- secp256r1: Depending on the implementation, the performance of ECDSA with secp256r1 can vary, and it may require more processing power.
+- Curve25519: EdDSA with Curve25519 tends to have better performance in terms of both speed and efficiency.
