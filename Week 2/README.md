@@ -124,7 +124,9 @@ It's important to note that the choice between ECDSA and EdDSA may depend on spe
 Task 2.1.2
 - Legacy (genrsa): ``time openssl genrsa -out private_rsa_key_legacy.pem 4096``
 - Newer (genpkey): ``time openssl genpkey -algorithm RSA -out private_rsa_key_new.pem -aes256``
-
+- secp256r1: ` time openssl ecparam -name secp256r1 -genkey -noout -out private_ecdsa_secp256r1.pem`
+- Curve25519: `time openssl ecparam -name Curve25519 -genkey -noout -out private_ecdsa_curve25519.pem`
+  
 Task 2.1.3
 
 The curves secp256r1 (used in ECDSA) and Curve25519 (used in EdDSA) are different elliptic curves with distinct properties. Here are some practical differences between them:
@@ -144,7 +146,7 @@ The curves secp256r1 (used in ECDSA) and Curve25519 (used in EdDSA) are differen
 - secp256r1: It is considered secure and has been widely used in practice. However, concerns have been raised about the NIST curves and their potential vulnerabilities to certain types of attacks.
 - Curve25519: It is designed to offer a high level of security. The curve's structure and choice of parameters aim to mitigate potential vulnerabilities found in other curves.
 
-4.Ease of Implementation:
+4. Ease of Implementation:
 
 - secp256r1: Implementing ECDSA with secp256r1 involves more complex arithmetic operations on prime fields.
 - Curve25519: Implementing EdDSA with Curve25519 is often considered more straightforward due to the curve's specific structure, making it suitable for various platforms.
@@ -153,3 +155,107 @@ The curves secp256r1 (used in ECDSA) and Curve25519 (used in EdDSA) are differen
 
 - secp256r1: Depending on the implementation, the performance of ECDSA with secp256r1 can vary, and it may require more processing power.
 - Curve25519: EdDSA with Curve25519 tends to have better performance in terms of both speed and efficiency.
+
+Task 2.1.4
+
+Based on the execution times for key generation commands using OpenSSL, I observed some differences in the time it takes to generate keys for different algorithms. To summarize the observations:
+
+1. RSA Key Generation:
+
+- Legacy Command (genrsa): 0.52 seconds
+- Newer Command (genpkey): 16.012 seconds
+  
+There is a significant time difference between the legacy and newer commands for RSA key generation. The newer command likely involves additional operations or security measures, contributing to the increased time.
+
+2. ECDSA Key Generation (secp256r1 curve):
+
+- ecparam Command: 0.01 seconds
+
+The ECDSA key generation using the ecparam command for the secp256r1 curve is relatively fast.
+
+3. EdDSA Key Generation (Curve25519 curve):
+
+- genpkey Command: 0.01 seconds
+
+The EdDSA key generation using the genpkey command for the Curve25519 curve is also fast.
+
+In summary, there are significant time differences between the RSA key generation methods (genrsa and genpkey). However, for elliptic curve algorithms (ECDSA and EdDSA), the key generation times are relatively low and comparable. The exact times can vary based on the specific hardware and system configurations.
+
+Task 2.1.5
+
+DSA (Digital Signature Algorithm) and its elliptic curve variant ECDSA (Elliptic Curve Digital Signature Algorithm) have been considered problematic or weak in certain scenarios due to various reasons:
+
+1. Key Length and Security Margins:
+
+- DSA and ECDSA rely on discrete logarithm problems for their security. The key length chosen significantly impacts security. In some cases, shorter key lengths were used for performance reasons, making them vulnerable to attacks.
+
+2. Random Number Generation:
+
+- The generation of random numbers is crucial in DSA and ECDSA. If the random number generation is flawed or predictable, it can lead to the compromise of private keys.
+
+3. Deterministic Signatures:
+
+- DSA and ECDSA signatures can be deterministic if the same private key and message are used, leading to potential risks in certain contexts.
+Quantum Computing Threat:
+
+Both DSA and ECDSA are susceptible to attacks by quantum computers, which could solve certain mathematical problems (e.g., discrete logarithms) exponentially faster than classical computers.
+In contrast, EdDSA (Edwards-curve Digital Signature Algorithm) with the Ed25519 curve is considered a better alternative for several reasons:
+
+1. Simplicity and Security:
+
+- EdDSA is designed to be simpler and more secure. It uses a twisted Edwards curve (Curve25519), which offers strong security properties.
+
+2. Efficiency:
+
+- EdDSA is efficient both in terms of computational speed and key generation. It provides good performance without sacrificing security.
+
+3. Deterministic Signatures:
+
+- EdDSA signatures are naturally deterministic, which eliminates certain classes of implementation errors and potential vulnerabilities.
+
+4. Resistance to Side-Channel Attacks:
+
+- EdDSA implementations are resistant to various side-channel attacks, making them more secure in practical deployment scenarios.
+
+5. Quantum Resistance:
+
+- EdDSA is believed to be resistant to attacks by quantum computers due to the underlying mathematical structure.
+
+For these reasons, EdDSA, especially when used with the Ed25519 curve, is considered a more modern and secure alternative to DSA and ECDSA in many applications. It addresses some of the weaknesses and challenges associated with the older algorithms.
+
+
+- Generated keys
+- genrsa (Legacy):
+  
+  ``MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAoHCRhKyu7Pzj1zMKaWGd
+J7qXpUV96Xyor34dOeCkFplzB0vZl6u6px3mCPQn8HWV8zoEC/MfG5QZJhyJzT8I
+NTUQpnioXOU4kgLBkMAgZB2jXmD0wqK0Q/7IR/pMgZXlCR4eoSzo5s58Jjm5jOsf
+YDT0WLxNnOree2e7InswlLgyc2ocj+0uZA1mf8/KK3RLJc9ifFvzs071cimACo2r
+C+RxH5Noj7iqqlmq7I9evQr31d/0kEWQKNyIhi0t7ftjWpsTjBC/b2K/W3FLLx9f
+yTiMx1JX85B+J/EvgXduWEvAfBdiHMe5vxzSm8gKsCXnVVXnDsgUzRLJ4AjNliqe
+qF65EY6erGtVEs4WOpDMTHEoMXAED8lkr93cb+7/WiF+VDr7UGGIryjPUCe9gRTe
+XO4m6HGmI7q6+vPPSY4iSk9hbtLqRocWJ+b2IspBv4W7arC763TKqmyvzrELgqE9
+jWNY+Yr6n7IPM4KeriRNT+sxLC/KuUiqfCel8yXJ/FZDExAay+wopg7mLRdVpWP0
+oILTmD3GFsyctVZyS8tdC1nXEIBYXgGb1wgHFYHgjjjZMSucrESMi/lqfQui2sNr
+fMCULg9eP8xUsvaAobBf55tiqw13D4UEszmdWiQ3+NJ2ZpeTeWC06djd9YJsxQJ+
+q1H/293tK0E4+q+2EslWRhMCAwEAAQ==``
+- genrsa (Newer):
+  
+  ``MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAs2si3aIqJGmhRtyYVj2X
+Uci7EmD0zaZbWtsh1sHOob5AV6GKkgPTwLidvqL5JMq91P195MzM+qOvNjTgJi3m
+u6Z7yReRBi8PZCtPg6LcQMJ6Eqqv6FfYF3QsQUuM2q2rRD2/JRTItTMfWXhC2ug9
+82skM7ZIYQNCIXNxG8+VPFuQ8VU7U1bFQkiWnxFYy1+VCv2CXl7/Lerozel0A3RB
+jDVMIpIfG8AHz/riI2mj7QuAlIJzM0v8fyvaahPqju6/eWKJxAQtdP3x3tydfs3w
+YINDyt9balBeePfG2FVHcmSW48bN/ZsJ/LiosJNVq8G32xqMJORaT/SyLKPLw1Uu
+qQIDAQAB``
+
+- ECDSA (secp256r1):
+
+  `MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEZTJ0Ozh3QSiD7Sk+0Vd87+Y5hCQA
+9FurI18WaB4kuwawR0g9XZZhDIs9SGhyfPddi80G2kPgYFs98fkInafySA==`
+
+- EdDSA (Ed25519):
+  
+   `MCowBQYDK2VwAyEAGEua52QW4ayM7+51KibrJGd/WtF7X88PLtLx0rYYBKA=`
+  
+  ----
