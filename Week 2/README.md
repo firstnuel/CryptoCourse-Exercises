@@ -72,3 +72,31 @@ Task 1.3:
 
 - ECB and CBC introduce additional blocks for padding, making the ciphertext longer than the plaintext.
 - CTR does not introduce additional blocks, so the ciphertext length is the same as the plaintext length.
+
+
+Task 2.1
+
+The comparison of the results and the time taken for RSA key generation using OpenSSL's genrsa and genpkey commands reveals some differences:
+
+1. Execution Time:
+
+- genrsa (Legacy): 0.585 seconds
+- genpkey (Newer): 16.012 seconds
+  
+The newer genpkey command took significantly more time compared to the legacy genrsa command. This increase in execution time could be attributed to additional operations or features introduced in the newer command.
+
+2. Key Format:
+
+- genrsa (Legacy): Generates a traditional unencrypted RSA private key.
+- genpkey (Newer): Generates an encrypted RSA private key using AES-256.
+  
+The newer genpkey command by default generates an encrypted private key, adding a layer of security by requiring a passphrase for decryption. This can be an advantage in certain security contexts.
+
+3. Public Key Extraction:
+
+- Both legacy and newer commands support extracting the public key from the generated private key.
+  
+Conclusion:
+
+The choice between genrsa and genpkey depends on specific requirements. If the key generation time is a critical factor and an encrypted private key is not needed, the legacy genrsa command might be preferred.
+If enhanced security features such as encrypted private keys are required, the newer genpkey command is a suitable choice.
