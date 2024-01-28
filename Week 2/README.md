@@ -299,13 +299,7 @@ ciphertext = cipher.encrypt(bytes(modified_ascii))
 #convert byte string to Hexadecimal
 hex_string = binascii.hexlify(ciphertext).decode('utf-8')
 
-#convert hex string to sha256 hash
-byte_string = bytes.fromhex(hex_string)
-hash_object = hashlib.sha256(byte_string)
-hash_hex = hash_object.hexdigest()
-
 print("Hexadecimal String:", hex_string)
-print("Sha256 hash:, hash_hex)  
 
 ```
 - Output
@@ -316,17 +310,17 @@ Task 3.2
 
 The flaw exploited in Task 3.1 lies in the nature of how the encryption mode—specifically, Counter (CTR) mode—was used, rather than a flaw in the block cipher (AES) itself. Let's break down the key points:
 The Flaw
-1. Predictability and Manipulability of the Keystream: In CTR mode, encryption is achieved by generating a keystream from the nonce (initialization vector or IV) and counter, which is then XORed with the plaintext to produce the ciphertext. If an attacker knows the plaintext and the corresponding ciphertext, they can derive the keystream by XORing them together. This derived keystream can then be used to encrypt new messages of their choosing, as demonstrated in Task 3.1.
+-  Predictability and Manipulability of the Keystream: In CTR mode, encryption is achieved by generating a keystream from the nonce (initialization vector or IV) and counter, which is then XORed with the plaintext to produce the ciphertext. If an attacker knows the plaintext and the corresponding ciphertext, they can derive the keystream by XORing them together. This derived keystream can then be used to encrypt new messages of their choosing, as demonstrated in Task 3.1.
    
-3. Lack of Authentication: The flaw also highlights the lack of authentication in pure CTR mode. Without authentication (like that provided by modes such as GCM or by using an HMAC), an attacker can modify the ciphertext without detection, leading to potential vulnerabilities.
+- Lack of Authentication: The flaw also highlights the lack of authentication in pure CTR mode. Without authentication (like that provided by modes such as GCM or by using an HMAC), an attacker can modify the ciphertext without detection, leading to potential vulnerabilities.
    
 Usage of Block Cipher
-• Yes, We Are Using a Block Cipher: AES is a block cipher, and in CTR mode, it is used to encrypt a counter value to produce a keystream block. The keystream is then XORed with the plaintext blocks to produce the ciphertext. The critical aspect of CTR mode is that it turns the block cipher into a stream cipher by encrypting successive values of a counter. The actual encryption process does not directly apply AES to the plaintext; instead, AES encrypts the counter values.
+- Yes, We Are Using a Block Cipher: AES is a block cipher, and in CTR mode, it is used to encrypt a counter value to produce a keystream block. The keystream is then XORed with the plaintext blocks to produce the ciphertext. The critical aspect of CTR mode is that it turns the block cipher into a stream cipher by encrypting successive values of a counter. The actual encryption process does not directly apply AES to the plaintext; instead, AES encrypts the counter values.
 
 Key Takeaways
-• CTR Mode's Dual-Edged Sword: The simplicity and parallelizability of CTR mode are advantageous for performance and efficiency. However, these same characteristics, if not carefully managed, can lead to security vulnerabilities. Specifically, without proper authentication mechanisms in place, encrypted messages can be vulnerable to unauthorized modifications.
+- CTR Mode's Dual-Edged Sword: The simplicity and parallelizability of CTR mode are advantageous for performance and efficiency. However, these same characteristics, if not carefully managed, can lead to security vulnerabilities. Specifically, without proper authentication mechanisms in place, encrypted messages can be vulnerable to unauthorized modifications.
 
-• Importance of Authentication: This scenario underscores the importance of using authenticated encryption modes or additional integrity checks when confidentiality and integrity are both critical. Modes like GCM (Galois/Counter Mode) provide both encryption and authentication, safeguarding against the type of flaw exploited in Task 3.1.
+- Importance of Authentication: This scenario underscores the importance of using authenticated encryption modes or additional integrity checks when confidentiality and integrity are both critical. Modes like GCM (Galois/Counter Mode) provide both encryption and authentication, safeguarding against the type of flaw exploited in Task 3.1.
 The flaw, therefore, is not in the AES block cipher itself but in how the CTR mode of operation was applied and the lack of message authentication to detect unauthorized changes to the ciphertext.
 
 Task 3.3
