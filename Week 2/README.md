@@ -299,8 +299,13 @@ ciphertext = cipher.encrypt(bytes(modified_ascii))
 #convert byte string to Hexadecimal
 hex_string = binascii.hexlify(ciphertext).decode('utf-8')
 
-print("Hexadecimal String:", hex_string)
+#convert hex string to sha256 hash
+byte_string = bytes.fromhex(hex_string)
+hash_object = hashlib.sha256(byte_string)
+hash_hex = hash_object.hexdigest()
 
+print("Hexadecimal String:", hex_string)
+print("Sha256 hash:, hash_hex)  
 
 ```
 - Output
