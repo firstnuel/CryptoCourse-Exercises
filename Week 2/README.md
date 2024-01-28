@@ -5,7 +5,7 @@
 Task 1.1:
 - Using Python pycryptodome library
 
-```
+```py
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 from Crypto.Util.Padding import pad
@@ -63,7 +63,7 @@ The nonce and salt are not the same. A nonce is typically used in conjunction wi
 Task 1.2:
 - ECB mode does not provide semantic security, as patterns in plaintext are visible in the ciphertext.
   
-- CBC mode provides better security than ECB, as the encryption of each block depends on the previous one.
+- CBC mode provides better security than ECB, as the encryption of each block depends on the previous one.kkppx
   
 - CTR mode provides parallelization and is not susceptible to the same padding oracle attacks as CBC.
 
@@ -259,3 +259,37 @@ qQIDAQAB``
    `MCowBQYDK2VwAyEAGEua52QW4ayM7+51KibrJGd/WtF7X88PLtLx0rYYBKA=`
   
   ----
+
+### Task 3: Forged cipher
+Task 3.1
+- This Python code defines a function new_ciphertext that takes an original ciphertext, original plaintext, and a desired plaintext as inputs. The goal is to modify the original ciphertext to correspond to the desired plaintext using a simple XOR operation
+
+  
+```py
+import binascii
+import hashlib  # Add this import
+from Crypto.Cipher import AES
+
+def new_ciphertext(original_ct, original_pt, desired_pt):
+    
+    original_ct_bytes = binascii.unhexlify(original_ct)
+    original_pt_bytes = original_pt.encode('utf-8')
+    desired_pt_bytes = desired_pt.encode('utf-8')
+
+    # Calculate new ciphertext
+    new_ct_bytes = bytes(
+        original_byte ^ (original_pt_byte ^ desired_pt_byte)
+        for original_byte, original_pt_byte, desired_pt_byte
+        in zip(original_ct_bytes, original_pt_bytes, desired_pt_bytes)
+    )
+    modified_ct_hex = binascii.hexlify(new_ct_bytes).decode('utf-8')
+
+    return modified_ct_hex
+
+original_ct = "a7896ad1b2f7da8d40b33d1438e04a839a88b5c9a97625fe5017a5e1fb542072595d804d5ad1a3af11ea7244a39d76cde1"
+original_pt = "Move the tables to the patio as soon as possible!"
+desired_pt = "Move the chairs to the house as soon as possible!"
+modified_ct = new_ciphertext(original_ct, original_pt, desired_pt)
+
+print("Modified Ciphertext:", modified_ct)
+```
