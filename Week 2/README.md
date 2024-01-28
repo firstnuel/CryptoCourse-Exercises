@@ -262,34 +262,68 @@ qQIDAQAB``
 
 ### Task 3: Forged cipher
 Task 3.1
-- This Python code defines a function new_ciphertext that takes an original ciphertext, original plaintext, and a desired plaintext as inputs. The goal is to modify the original ciphertext to correspond to the desired plaintext using a simple XOR operation
-
-  
+- This code demonstrates a simple cryptographic operation involving the XOR (exclusive OR) operation, ASCII encoding, and AES encryption in Counter (CTR) mode. Let's break down the code step by step:
+ 
 ```py
-import binascii
-import hashlib  # Add this import
 from Crypto.Cipher import AES
+import hashlib
+import binascii
 
-def new_ciphertext(original_ct, original_pt, desired_pt):
-    
-    original_ct_bytes = binascii.unhexlify(original_ct)
-    original_pt_bytes = original_pt.encode('utf-8')
-    desired_pt_bytes = desired_pt.encode('utf-8')
+original_message = "Move the tables to the patio as soon as possible!"
+desired_message = "Move the chairs to the house as soon as possible!"
 
-    # Calculate new ciphertext
-    new_ct_bytes = bytes(
-        original_byte ^ (original_pt_byte ^ desired_pt_byte)
-        for original_byte, original_pt_byte, desired_pt_byte
-        in zip(original_ct_bytes, original_pt_bytes, desired_pt_bytes)
-    )
-    modified_ct_hex = binascii.hexlify(new_ct_bytes).decode('utf-8')
+# Convert the original message to ASCII values
+original_ascii = [ord(c) for c in original_message]
 
-    return modified_ct_hex
+# Convert the desired message to ASCII values
+desired_ascii = [ord(c) for c in desired_message]
 
-original_ct = "a7896ad1b2f7da8d40b33d1438e04a839a88b5c9a97625fe5017a5e1fb542072595d804d5ad1a3af11ea7244a39d76cde1"
-original_pt = "Move the tables to the patio as soon as possible!"
-desired_pt = "Move the chairs to the house as soon as possible!"
-modified_ct = new_ciphertext(original_ct, original_pt, desired_pt)
+# XOR the ASCII values of the original message with the ASCII values of the desired message
+xor_result = [a ^ b for a, b in zip(original_ascii, desired_ascii)]
 
-print("Modified Ciphertext:", modified_ct)
+# Convert the XOR result back to characters
+modified_message = "".join([chr(c) for c in xor_result])
+
+# Convert the modified message to ASCII values
+modified_ascii = [ord(c) for c in modified_message]
+
+# Generate a 128-bit key (16 bytes)
+key = hashlib.sha256(b"my_secret_key").digest()[:16]
+
+# Create an AES cipher object in Counter mode with the key and an unknown IV
+cipher = AES.new(key, AES.MODE_CTR)
+
+# Encrypt the modified ASCII values using AES encryption in Counter mode
+ciphertext = cipher.encrypt(bytes(modified_ascii))
+
+#convert byte string to Hexadecimal
+hex_string = binascii.hexlify(ciphertext).decode('utf-8')
+
+print("Hexadecimal String:", hex_string)
+
+
 ```
+- Output
+  
+![ss1](https://github.com/firstnuel/CryptoCourse-Exercises/blob/main/Week%202/sc2.png)
+
+Task 3.2
+
+The flaw exploited in Task 3.1 lies in the nature of how the encryption mode—specifically, Counter (CTR) mode—was used, rather than a flaw in the block cipher (AES) itself. Let's break down the key points:
+The Flaw
+1. Predictability and Manipulability of the Keystream: In CTR mode, encryption is achieved by generating a keystream from the nonce (initialization vector or IV) and counter, which is then XORed with the plaintext to produce the ciphertext. If an attacker knows the plaintext and the corresponding ciphertext, they can derive the keystream by XORing them together. This derived keystream can then be used to encrypt new messages of their choosing, as demonstrated in Task 3.1.
+   
+3. Lack of Authentication: The flaw also highlights the lack of authentication in pure CTR mode. Without authentication (like that provided by modes such as GCM or by using an HMAC), an attacker can modify the ciphertext without detection, leading to potential vulnerabilities.
+   
+Usage of Block Cipher
+• Yes, We Are Using a Block Cipher: AES is a block cipher, and in CTR mode, it is used to encrypt a counter value to produce a keystream block. The keystream is then XORed with the plaintext blocks to produce the ciphertext. The critical aspect of CTR mode is that it turns the block cipher into a stream cipher by encrypting successive values of a counter. The actual encryption process does not directly apply AES to the plaintext; instead, AES encrypts the counter values.
+
+Key Takeaways
+• CTR Mode's Dual-Edged Sword: The simplicity and parallelizability of CTR mode are advantageous for performance and efficiency. However, these same characteristics, if not carefully managed, can lead to security vulnerabilities. Specifically, without proper authentication mechanisms in place, encrypted messages can be vulnerable to unauthorized modifications.
+
+• Importance of Authentication: This scenario underscores the importance of using authenticated encryption modes or additional integrity checks when confidentiality and integrity are both critical. Modes like GCM (Galois/Counter Mode) provide both encryption and authentication, safeguarding against the type of flaw exploited in Task 3.1.
+The flaw, therefore, is not in the AES block cipher itself but in how the CTR mode of operation was applied and the lack of message authentication to detect unauthorized changes to the ciphertext.
+
+Task 3.3
+
+Modifying ciphertext without proper understanding and adherence to specific constraints can lead to unintended consequences and compromise the security of the encryption process. Block size, CTR mode, and block structure play crucial roles in ensuring the integrity of modified ciphertext. Block size limitations dictate that modifications must align with the cipher's block size, ensuring that changes are made at the block level, not individual bytes. In AES, for instance, this means modifying 16-byte blocks. CTR mode introduces additional considerations, as modifications should account for the counter and nonce values used in this mode. Tampering with these values can disrupt synchronization between sender and receiver, rendering the modified ciphertext unusable. Understanding the block structure of the cipher is essential for making meaningful modifications. Simply XORing bytes without considering the block layout may not yield the desired results.
