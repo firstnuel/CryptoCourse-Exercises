@@ -302,9 +302,7 @@ hex_string = binascii.hexlify(ciphertext).decode('utf-8')
 print("Hexadecimal String:", hex_string)
 
 ```
-- Output
-  
-![ss1](https://github.com/firstnuel/CryptoCourse-Exercises/blob/main/Week%202/sc2.png)
+- Output Result: a7896ad1b2f7da8d40a434173df74a839a88b5c9a97625e65e16bfebfb542072595d804d5ad1a3af11ea7244a39d76cde1  
 
 Task 3.2
 
