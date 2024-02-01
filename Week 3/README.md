@@ -99,15 +99,15 @@ Performance Measurement
 - To measure the time taken to encrypt the data for each cipher.
 The encryption times for the 10 MB data using different ciphers are as follows:
 
-- AES-CBC: Approximately 0.192 seconds
-- AES-CTR: Approximately 0.147 seconds
-- ChaCha20: Approximately 0.406 seconds
+- AES-CBC: Approximately 0.0236 seconds
+- AES-CTR: Approximately 0.0097 seconds
+- ChaCha20: Approximately 0.027 seconds
   
 Observations:
-- AES-CTR is the most efficient in this test, with the shortest encryption time. This might be due to its simpler operational mode compared to AES-CBC, as it does not require padding and operates more like a stream cipher.
-- AES-CBC is slightly slower than AES-CTR but still faster than ChaCha20 in this environment.
-- ChaCha20 shows the longest encryption time among the three. However, it's important to note that ChaCha20 is often favored for its security properties and performance on systems without AES hardware acceleration.
-  
+- AES-CTR is the fastest, which aligns with the expectation that counter mode (CTR) generally has a performance advantage due to its parallelizable nature and simpler implementation.
+- AES-CBC is faster on my system compared to ChaCha20, which is quite interesting. This could be due to hardware acceleration for AES (like AES-NI) being present on my system. AES-NI significantly boosts AES encryption/decryption speeds and is commonly available in modern processors.
+- ChaCha20, while slower than both AES modes on my system, still shows a competitive performance. This cipher is often favored in environments where hardware acceleration for AES is not available, as it provides a good balance of security and performance, especially on mobile and lower-power devices.
+
 Hardware Support:
 - The Python environment used for this test does not explicitly utilize hardware acceleration features like AES-NI, which are available in modern CPUs for AES encryption.
 On systems with hardware acceleration, AES encryption (both CBC and CTR modes) would likely be significantly faster, possibly outperforming ChaCha20.
