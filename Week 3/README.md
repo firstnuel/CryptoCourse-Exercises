@@ -83,4 +83,73 @@ Encrypt both messages with their respective keys and the same nonce.
   
   ciphertext1_hex, ciphertext2_hex
   ````
+Task 1.3
 
+Comparing the encryption speed of AES-CBC, AES-CTR, and a selected stream cipher, I will conduct a basic performance test in Python. For the stream cipher, I'll use ChaCha20, a widely-used and secure stream cipher. The test will involve encrypting a reasonably large amount of data to minimize the impact of system noise on the results.
+
+Test Setup
+- Data Size: To encrypt a large enough data block, such as 10 MB, to ensure the results are not heavily influenced by system overhead or noise.
+
+Cipher Configuration:
+- AES-CBC and AES-CTR: Both use a 256-bit key.
+
+- ChaCha20: Uses its standard configuration.
+
+Performance Measurement
+- To measure the time taken to encrypt the data for each cipher.
+The encryption times for the 10 MB data using different ciphers are as follows:
+
+- AES-CBC: Approximately 0.192 seconds
+- AES-CTR: Approximately 0.147 seconds
+- ChaCha20: Approximately 0.406 seconds
+  
+Observations:
+- AES-CTR is the most efficient in this test, with the shortest encryption time. This might be due to its simpler operational mode compared to AES-CBC, as it does not require padding and operates more like a stream cipher.
+- AES-CBC is slightly slower than AES-CTR but still faster than ChaCha20 in this environment.
+- ChaCha20 shows the longest encryption time among the three. However, it's important to note that ChaCha20 is often favored for its security properties and performance on systems without AES hardware acceleration.
+  
+Hardware Support:
+- The Python environment used for this test does not explicitly utilize hardware acceleration features like AES-NI, which are available in modern CPUs for AES encryption.
+On systems with hardware acceleration, AES encryption (both CBC and CTR modes) would likely be significantly faster, possibly outperforming ChaCha20.
+
+Conclusion:
+- The difference in encryption speed is noticeable but not drastic in this test environment. However, the actual performance can vary based on the hardware and specific implementation.
+In more practical applications, the choice between these ciphers should also consider factors like security requirements, hardware capabilities, and the specific nature of the data and system architecture
+
+- Code Used
+  ````py
+  import time
+  from Crypto.Cipher import AES, ChaCha20
+  from Crypto.Random import get_random_bytes
+  
+  # Test data setup
+  data = get_random_bytes(10 * 1024 * 1024)  # 10 MB of random data
+  key_aes = get_random_bytes(32)  # 256-bit key for AES
+  key_chacha20 = get_random_bytes(32)  # 256-bit key for ChaCha20
+  iv = get_random_bytes(16)  # Initialization vector for AES-CBC
+  nonce = get_random_bytes(8)  # Nonce for AES-CTR and ChaCha20
+  
+  # Function to measure encryption time
+  def measure_encryption_time(cipher, data):
+      start_time = time.time()
+      cipher.encrypt(data)
+      end_time = time.time()
+      return end_time - start_time
+  
+  # AES-CBC
+  cipher_aes_cbc = AES.new(key_aes, AES.MODE_CBC, iv)
+  time_aes_cbc = measure_encryption_time(cipher_aes_cbc, data)
+  
+  # AES-CTR
+  cipher_aes_ctr = AES.new(key_aes, AES.MODE_CTR, nonce=nonce)
+  time_aes_ctr = measure_encryption_time(cipher_aes_ctr, data)
+  
+  # ChaCha20
+  cipher_chacha20 = ChaCha20.new(key=key_chacha20, nonce=nonce)
+  time_chacha20 = measure_encryption_time(cipher_chacha20, data)
+  
+  time_aes_cbc, time_aes_ctr, time_chacha20
+
+  ````
+  Results:
+  ![sc1](https://github.com/firstnuel/CryptoCourse-Exercises/blob/main/Week%203/sc1.png)
