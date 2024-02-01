@@ -309,7 +309,7 @@ print(cookie)
 ````
 ![sc2](https://github.com/firstnuel/CryptoCourse-Exercises/blob/main/Week%203/sc4.png)
 
-This code should parses the  cookie into its components: username, secret, and hash. 
+This code parses the  cookie into its components: username, secret, and hash. 
 
 ````py
 cookie_str = 'dXNlcm5hbWU9Y3J5cHRvbmF0b3I7c2VjcmV0PTQwN2M2OTFmNzlkMDk2NDEyYmFlMmIxMzNlMmQwNTM0MTQxNjcwNDJiNTU5MjhmMzRhMmMxNWM4NDIxMGQyOTc7.WnX5M/8dfvyMsOmjozOaOfx1V37jebyHZBhsgJq/RRc='
@@ -336,6 +336,8 @@ key, data, data_hash, hash_signature
 ````
 
 ![sc2](https://github.com/firstnuel/CryptoCourse-Exercises/blob/main/Week%203/sc5.png)
+
+Modified Cookie:
 
 This script will attempt to create a new cookie that includes the admin=true data with a valid hash, exploiting the length extension vulnerability.
 The actual key_length was not known to me so I created a loop to generate a list of possible hashes by generating from all key length values for the `range(10, 20)` using Hashpump
@@ -393,6 +395,8 @@ print("Modified Cookies:", modified_cookies)
 
 ````
 ![sc2](https://github.com/firstnuel/CryptoCourse-Exercises/blob/main/Week%203/sc6.png)
+
+Send a Request with the Modified Cookie:
 
 For each cookie in the list, the code creates a new session, sets the modified cookie, and sends a GET request to the URL. It then prints out the status code for each request, which will helps to understand how the server responds to each modified cookie.
 
