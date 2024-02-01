@@ -281,3 +281,32 @@ preimage_1_zero, preimage_2_zeros, preimage_3_zeros
 - Hash Value: '00000013500100742bbf4125f84cf78c'
 - Time Taken: Approximately 72.08 seconds
 
+------
+
+
+Task 4: MACs gone wrong
+
+Approach:
+- Analyze the Cookie Format: Understand how the cookie is structured (key, data, hash) and how the server validates it.
+- Length Extension Attack: Use an existing tool to perform a length extension attack on the SHA-256 hash. Using  hashpump.
+- Create a Modified Cookie: Generate a new valid hash for the modified cookie data (e.g., changing the user role to admin).
+- Send a Request with the Modified Cookie: Use Python's requests library to send an HTTP request with the modified cookie to access the /admin/top-secret route.
+
+- Used this code to get the cookie
+````py
+import requests
+
+# Replace with the actual login URL and credentials
+login_url = '"http://0.0.0.0:5000/login'
+credentials = {'username': 'cryptonator', 'password': 'cryptonator'}
+
+session = requests.Session()
+response = session.post(login_url, data=credentials)
+
+# Retrieve the session cookie
+cookie = session.cookies.get_dict()
+print(cookie)
+````
+![sc2](https://github.com/firstnuel/CryptoCourse-Exercises/blob/main/Week%203/sc4.png)
+
+
