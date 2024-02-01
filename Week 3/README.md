@@ -153,3 +153,48 @@ In more practical applications, the choice between these ciphers should also con
   ````
   Results:
   ![sc1](https://github.com/firstnuel/CryptoCourse-Exercises/blob/main/Week%203/sc1.png)
+
+  
+### Task 2: Partial collisions and preimages of hash functions
+
+To implement a partial collision search for different hash functions (MD5, SHA-1, SHA-3, etc.) and find partially colliding messages for the first 2-4 bytes of the hash value, we'll follow these steps:
+
+- Hash Function Selection: I'll choose MD5, SHA-1, and SHA-3 for this demonstration.
+- Collision Search: I'll generate random messages and calculate their hash values until we find two different messages that have the same first few bytes in their hash values.
+- Partial Collision: I'll focus on finding a collision in the first 2-4 bytes of the hash.
+- Time Measurement: I'll measure the time taken to find each collision.
+
+````py
+  import hashlib
+  import time
+  import random
+  import string
+  
+  # Function to generate a random message
+  def generate_random_message(length=10):
+      letters = string.ascii_letters + string.digits
+      return ''.join(random.choice(letters) for i in range(length))
+  
+  # Function to find partial collision
+  def find_partial_collision(hash_function, bytes_to_match=2):
+      start_time = time.time()
+      seen_hashes = {}
+      while True:
+          message = generate_random_message()
+          hash_digest = hash_function(message.encode()).hexdigest()
+          short_hash = hash_digest[:bytes_to_match*2]  # 2 hex chars per byte
+          if short_hash in seen_hashes:
+              return message, seen_hashes[short_hash], hash_digest, time.time() - start_time
+          else:
+              seen_hashes[short_hash] = message
+  
+  # Finding partial collisions
+  collision_md5 = find_partial_collision(hashlib.md5, 2)
+  collision_sha1 = find_partial_collision(hashlib.sha1, 2)
+  collision_sha3 = find_partial_collision(hashlib.sha3_256, 2)
+  
+  print(collision_md5)
+  print(collision_sha1)
+  print(collision_sha3)
+````
+![sc2](https://github.com/firstnuel/CryptoCourse-Exercises/blob/main/Week%203/sc2.png)
