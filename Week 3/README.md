@@ -83,4 +83,118 @@ Encrypt both messages with their respective keys and the same nonce.
   
   ciphertext1_hex, ciphertext2_hex
   ````
+Task 1.3
 
+Comparing the encryption speed of AES-CBC, AES-CTR, and a selected stream cipher, I will conduct a basic performance test in Python. For the stream cipher, I'll use ChaCha20, a widely-used and secure stream cipher. The test will involve encrypting a reasonably large amount of data to minimize the impact of system noise on the results.
+
+Test Setup
+- Data Size: To encrypt a large enough data block, such as 10 MB, to ensure the results are not heavily influenced by system overhead or noise.
+
+Cipher Configuration:
+- AES-CBC and AES-CTR: Both use a 256-bit key.
+
+- ChaCha20: Uses its standard configuration.
+
+Performance Measurement
+- To measure the time taken to encrypt the data for each cipher.
+The encryption times for the 10 MB data using different ciphers are as follows:
+
+- AES-CBC: Approximately 0.0236 seconds
+- AES-CTR: Approximately 0.0097 seconds
+- ChaCha20: Approximately 0.027 seconds
+  
+Observations:
+- AES-CTR is the fastest, which aligns with the expectation that counter mode (CTR) generally has a performance advantage due to its parallelizable nature and simpler implementation.
+- AES-CBC is faster on my system compared to ChaCha20, which is quite interesting. This could be due to hardware acceleration for AES (like AES-NI) being present on my system. AES-NI significantly boosts AES encryption/decryption speeds and is commonly available in modern processors.
+- ChaCha20, while slower than both AES modes on my system, still shows a competitive performance. This cipher is often favored in environments where hardware acceleration for AES is not available, as it provides a good balance of security and performance, especially on mobile and lower-power devices.
+
+Hardware Support:
+- The Python environment used for this test does not explicitly utilize hardware acceleration features like AES-NI, which are available in modern CPUs for AES encryption.
+On systems with hardware acceleration, AES encryption (both CBC and CTR modes) would likely be significantly faster, possibly outperforming ChaCha20.
+
+Conclusion:
+- The difference in encryption speed is noticeable but not drastic in this test environment. However, the actual performance can vary based on the hardware and specific implementation.
+In more practical applications, the choice between these ciphers should also consider factors like security requirements, hardware capabilities, and the specific nature of the data and system architecture
+
+- Code Used
+  ````py
+  import time
+  from Crypto.Cipher import AES, ChaCha20
+  from Crypto.Random import get_random_bytes
+  
+  # Test data setup
+  data = get_random_bytes(10 * 1024 * 1024)  # 10 MB of random data
+  key_aes = get_random_bytes(32)  # 256-bit key for AES
+  key_chacha20 = get_random_bytes(32)  # 256-bit key for ChaCha20
+  iv = get_random_bytes(16)  # Initialization vector for AES-CBC
+  nonce = get_random_bytes(8)  # Nonce for AES-CTR and ChaCha20
+  
+  # Function to measure encryption time
+  def measure_encryption_time(cipher, data):
+      start_time = time.time()
+      cipher.encrypt(data)
+      end_time = time.time()
+      return end_time - start_time
+  
+  # AES-CBC
+  cipher_aes_cbc = AES.new(key_aes, AES.MODE_CBC, iv)
+  time_aes_cbc = measure_encryption_time(cipher_aes_cbc, data)
+  
+  # AES-CTR
+  cipher_aes_ctr = AES.new(key_aes, AES.MODE_CTR, nonce=nonce)
+  time_aes_ctr = measure_encryption_time(cipher_aes_ctr, data)
+  
+  # ChaCha20
+  cipher_chacha20 = ChaCha20.new(key=key_chacha20, nonce=nonce)
+  time_chacha20 = measure_encryption_time(cipher_chacha20, data)
+  
+  time_aes_cbc, time_aes_ctr, time_chacha20
+
+  ````
+  Results:
+  ![sc1](https://github.com/firstnuel/CryptoCourse-Exercises/blob/main/Week%203/sc1.png)
+
+  
+### Task 2: Partial collisions and preimages of hash functions
+
+To implement a partial collision search for different hash functions (MD5, SHA-1, SHA-3, etc.) and find partially colliding messages for the first 2-4 bytes of the hash value, we'll follow these steps:
+
+- Hash Function Selection: I'll choose MD5, SHA-1, and SHA-3 for this demonstration.
+- Collision Search: I'll generate random messages and calculate their hash values until we find two different messages that have the same first few bytes in their hash values.
+- Partial Collision: I'll focus on finding a collision in the first 2-4 bytes of the hash.
+- Time Measurement: I'll measure the time taken to find each collision.
+
+````py
+  import hashlib
+  import time
+  import random
+  import string
+  
+  # Function to generate a random message
+  def generate_random_message(length=10):
+      letters = string.ascii_letters + string.digits
+      return ''.join(random.choice(letters) for i in range(length))
+  
+  # Function to find partial collision
+  def find_partial_collision(hash_function, bytes_to_match=2):
+      start_time = time.time()
+      seen_hashes = {}
+      while True:
+          message = generate_random_message()
+          hash_digest = hash_function(message.encode()).hexdigest()
+          short_hash = hash_digest[:bytes_to_match*2]  # 2 hex chars per byte
+          if short_hash in seen_hashes:
+              return message, seen_hashes[short_hash], hash_digest, time.time() - start_time
+          else:
+              seen_hashes[short_hash] = message
+  
+  # Finding partial collisions
+  collision_md5 = find_partial_collision(hashlib.md5, 2)
+  collision_sha1 = find_partial_collision(hashlib.sha1, 2)
+  collision_sha3 = find_partial_collision(hashlib.sha3_256, 2)
+  
+  print(collision_md5)
+  print(collision_sha1)
+  print(collision_sha3)
+````
+![sc2](https://github.com/firstnuel/CryptoCourse-Exercises/blob/main/Week%203/sc2.png)
