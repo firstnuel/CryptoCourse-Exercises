@@ -338,7 +338,7 @@ key, data, data_hash, hash_signature
 ![sc2](https://github.com/firstnuel/CryptoCourse-Exercises/blob/main/Week%203/sc5.png)
 
 This script will attempt to create a new cookie that includes the admin=true data with a valid hash, exploiting the length extension vulnerability.
-The actual key_length was not know so I created a loop to generate a list of possible hashes by generating from all key length values for the `range(10, 20)` using Hashpump
+The actual key_length was not known to me so I created a loop to generate a list of possible hashes by generating from all key length values for the `range(10, 20)` using Hashpump
 
 ````py
 import subprocess
@@ -393,3 +393,30 @@ print("Modified Cookies:", modified_cookies)
 
 ````
 ![sc2](https://github.com/firstnuel/CryptoCourse-Exercises/blob/main/Week%203/sc6.png)
+
+For each cookie in the list, the code creates a new session, sets the modified cookie, and sends a GET request to the URL. It then prints out the status code for each request, which will helps to understand how the server responds to each modified cookie.
+
+````py
+import requests
+
+def try_modified_cookies(url, modifiedcookies):
+    for i, cookie in enumerate(modifiedcookies):
+        # Creating a session object to handle cookies
+        session = requests.Session()
+
+        # Adding the modified cookie to the session
+        session.cookies.set('auth', cookie, domain='localhost', path='/')
+
+        # Sending a GET request to the target URL with the modified cookie
+        response = session.get(url)
+
+        # Print the response status code for each cookie
+        print(f"Cookie {i+1} status code: {response.status_code}")
+
+# The URL of the web application
+url = "http://0.0.0.0:5000/admin/top-secret"
+try_modified_cookies(url, modified_cookies)
+````
+![sc2](https://github.com/firstnuel/CryptoCourse-Exercises/blob/main/Week%203/sc7.png)
+
+I couldn't successfully access the route `/admin/top-secret` 
