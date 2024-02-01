@@ -153,9 +153,13 @@ In more practical applications, the choice between these ciphers should also con
   ````
   Results:
   ![sc1](https://github.com/firstnuel/CryptoCourse-Exercises/blob/main/Week%203/sc1.png)
+  
+-------
 
   
 ### Task 2: Partial collisions and preimages of hash functions
+
+Task 2.1
 
 To implement a partial collision search for different hash functions (MD5, SHA-1, SHA-3, etc.) and find partially colliding messages for the first 2-4 bytes of the hash value, we'll follow these steps:
 
@@ -198,3 +202,81 @@ To implement a partial collision search for different hash functions (MD5, SHA-1
   print(collision_sha3)
 ````
 ![sc2](https://github.com/firstnuel/CryptoCourse-Exercises/blob/main/Week%203/sc2.png)
+
+Results
+1. MD5 Collision:
+
+- Colliding Messages: '534Tz9hTUu' and 'BaFDcxxWuD'
+- Common Hash Prefix: be85
+- Time Taken: Approximately 0.002 seconds
+
+2. SHA-1 Collision:
+
+- Colliding Messages: 'ReqLj08enn' and 'WJINESvhiJ'
+- Common Hash Prefix: 55df
+- Time Taken: Approximately 0.00088 seconds
+  
+3. SHA-3 Collision:
+
+- Colliding Messages: 'XLj1oaanHr' and 'yyndNUny2w'
+- Common Hash Prefix: b55d
+- Time Taken: Approximately 0.00067 seconds
+
+Task 2.2
+
+Implementing a partial preimage search for a hash function like MD5 or SHA-1 involves finding a message that, when hashed, results in a hash value that starts with a specified number of zero bytes. The process is computationally intensive, as it generally requires a brute-force approach.
+
+Steps for this task:
+
+- Hash Function Selection: Choose MD5 for this demonstration.
+- Target Hash Prefix: To looking for hash values starting with 1-3 zero bytes (2, 4, or 6 zero hexadecimal characters).
+- Preimage Search: Generate random messages and hash them until we find one that matches the target hash prefix.
+- Time Measurement: Measure the time taken to find each preimage.
+
+````py
+import hashlib
+import time
+import random
+import string
+
+# Function to generate a random message
+def generate_random_message(length=10):
+    letters = string.ascii_letters + string.digits
+    return ''.join(random.choice(letters) for i in range(length))
+
+# Function to find partial preimage
+def find_partial_preimage(target_zeros, hash_function):
+    target_prefix = '0' * target_zeros
+    start_time = time.time()
+    while True:
+        message = generate_random_message()
+        hash_digest = hash_function(message.encode()).hexdigest()
+        if hash_digest.startswith(target_prefix):
+            return message, hash_digest, time.time() - start_time
+
+# Finding preimages for hash values starting with 1-3 zero bytes
+preimage_1_zero = find_partial_preimage(2, hashlib.md5)  # 1 zero byte
+preimage_2_zeros = find_partial_preimage(4, hashlib.md5) # 2 zero bytes
+preimage_3_zeros = find_partial_preimage(6, hashlib.md5) # 3 zero bytes
+
+preimage_1_zero, preimage_2_zeros, preimage_3_zeros
+````
+![sc2](https://github.com/firstnuel/CryptoCourse-Exercises/blob/main/Week%203/sc3.png)
+
+1. Preimage for 1 Zero Byte:
+
+- Preimage: '9LiJfjpHdh'
+- Hash Value: '006e3aca939fa74ab4356f946428f38a'
+- Time Taken: Approximately 0.006 seconds
+
+2.Preimage for 2 Zero Bytes:
+
+- Preimage: 'i1r7qNIylc'
+- Hash Value: '0000c195c744511b2fd8d4a52084c911'
+- Time Taken: Approximately 0.099 seconds
+  
+3.Preimage for 3 Zero Bytes:
+
+- Preimage: 'YVHOuod94t'
+- Hash Value: '00000013500100742bbf4125f84cf78c'
+- Time Taken: Approximately 72.08 seconds
