@@ -309,4 +309,87 @@ print(cookie)
 ````
 ![sc2](https://github.com/firstnuel/CryptoCourse-Exercises/blob/main/Week%203/sc4.png)
 
+This code should parses the  cookie into its components: username, secret, and hash. 
 
+````py
+cookie_str = 'dXNlcm5hbWU9Y3J5cHRvbmF0b3I7c2VjcmV0PTQwN2M2OTFmNzlkMDk2NDEyYmFlMmIxMzNlMmQwNTM0MTQxNjcwNDJiNTU5MjhmMzRhMmMxNWM4NDIxMGQyOTc7.WnX5M/8dfvyMsOmjozOaOfx1V37jebyHZBhsgJq/RRc='
+
+# Splitting the cookie into payload and signature
+parts = cookie_str.split('.')
+payload_b64 = parts[0]
+hash_signature = parts[1] if len(parts) > 1 else None
+
+# Decode the payload
+try:
+    payload = base64.b64decode(payload_b64).decode()
+except (base64.binascii.Error, UnicodeDecodeError):
+    payload = None
+
+# Extract key, data, and hash from the payload
+if payload:
+    key_data, _, data_hash = payload.partition(';')
+    key, _, data = key_data.partition('=')
+else:
+    key, data, data_hash = None, None, None
+
+key, data, data_hash, hash_signature
+````
+
+![sc2](https://github.com/firstnuel/CryptoCourse-Exercises/blob/main/Week%203/sc5.png)
+
+This script will attempt to create a new cookie that includes the admin=true data with a valid hash, exploiting the length extension vulnerability.
+The actual key_length was not know so I created a loop to generate a list of possible hashes by generating from all key length values for the `range(10, 20)` using Hashpump
+
+````py
+import subprocess
+import base64
+
+def hashpump(original_hash, original_data, append_data, key_length):
+    # Decoding the original hash from base64
+    original_hash_decoded = base64.b64decode(original_hash).hex()
+
+    # No need to decode original_data as it's not base64 encoded
+    original_data_decoded = original_data
+
+    process = subprocess.Popen(['hashpump', '-s', original_hash_decoded, '-d', original_data_decoded, '-a', append_data, '-k', str(key_length)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output, error = process.communicate()
+
+    if error:
+        print(f"Error with key length {key_length}:", error.decode())
+        return None, None
+
+    try:
+        new_hash, new_data = output.decode().strip().split('\n')
+        return new_hash, new_data
+    except ValueError:
+        print(f"Failed to unpack output with key length {key_length}:", output.decode())
+        return None, None
+
+def modify_cookie(original_hash, original_data, append_data):
+    modified_cookies = []
+    
+    for key_length in range(10, 20):
+        new_hash, new_data = hashpump(original_hash, original_data, append_data, key_length)
+
+        if new_hash and new_data:
+            # Encoding new data to base64
+            new_data_b64 = base64.b64encode(new_data.encode()).decode()
+
+            # Creating the new cookie
+            modified_cookie = f"{new_data_b64}.{new_hash}"
+            modified_cookies.append(modified_cookie)
+
+    return modified_cookies
+
+# Extracted details from the provided cookie
+original_hash = 'WnX5M/8dfvyMsOmjozOaOfx1V37jebyHZBhsgJq/RRc='
+original_data = 'username=cryptonator;secret=407c691f79d096412bae2b133e2d053414167042b55928f34a2c15c84210d297'
+append_data = 'admin=true'  # Data you want to append
+
+modified_cookies = modify_cookie(original_hash, original_data, append_data)
+
+# Print the list of modified cookies
+print("Modified Cookies:", modified_cookies)
+
+````
+![sc2](https://github.com/firstnuel/CryptoCourse-Exercises/blob/main/Week%203/sc6.png)
