@@ -57,7 +57,7 @@ First, we'll encrypt a message using AES in GCM mode with a full tag and then si
   print(f"Authentication Tag (first 2 bytes): {tag_short.hex()}")
   print(f"Number of Attempts: {attempts}")
   ````
-- ![sc1](./sc1.png)
+- [sc1](./sc1.png)
   
 Results
 - key: 6f81ef48667c117c19d8b2b34da90bbfd5b243048c853bb44b5c84871df3aca7
