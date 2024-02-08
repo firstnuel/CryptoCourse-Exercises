@@ -51,9 +51,19 @@ First, we'll encrypt a message using AES in GCM mode with a full tag and then si
   
   print(f"key: {key.hex()}")
   print(f"nonce: {nonce.hex()}")
-  print(f"Original Message, {message.decode()}")
-  print(f"Brute-Forced Message:, {random_message.decode()}")
-  print(f"Authentication Full Tag:, {random_tag_full.hex()}")
-  print(f"Authentication Tag (first 2 bytes):, {tag_short.hex()}")
-  print(f"Number of Attempts:, {attempts}")
+  print(f"Original Message: {message.decode()}")
+  print(f"Brute-Forced Message: {random_message.decode()}")
+  print(f"Authentication Full Tag: {random_tag_full.hex()}")
+  print(f"Authentication Tag (first 2 bytes): {tag_short.hex()}")
+  print(f"Number of Attempts: {attempts}")
   ````
+- ![sc1](./sc1.png)
+  
+Results
+- key: 6f81ef48667c117c19d8b2b34da90bbfd5b243048c853bb44b5c84871df3aca7
+- nonce: 83cc67d90a96e82cb2096f7b
+- Original Message: hello crypto
+- Brute-Forced Message: 6jcYLck57n08Oc8l
+- Authentication Full Tag: e20ba18cb12575e6d70f6ac1047b50dc
+- Authentication Tag (first 2 bytes): e20b
+- Number of Attempts: 24083
