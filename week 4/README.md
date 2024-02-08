@@ -120,4 +120,107 @@ nged Tag:", rearranged_tag)
 In the simulated example, we started with an initial sequence of blocks: ['C1', 'C2', 'C3', 'C4', 'C5']. By exploiting the property of the cycle where \(H^5 = H\), swapping the blocks `C1` and `C5` resulted in a new sequence: ['C5', 'C2', 'C3', 'C4', 'C1']. According to the cycle property described in the provided document, this rearrangement should not change the GHASH value, illustrating a potential forgery scenario.
 
 ----
+### Task 4: Forging CBC-MAC messages
 
+Task 4.1
+
+Limitations and Block Size Effect
+
+The main limitation when modifying a message in a way that the MAC remains valid is that you cannot arbitrarily change message content without knowing the secret key used for MAC generation. However, with a known Initialization Vector (IV) and understanding the block cipher mode operation, certain manipulations are possible.
+
+In CBC-MAC, the block size of the encryption algorithm directly impacts the manipulation possibilities. For example, if the block size is 16 bytes, you can only modify blocks of 16 bytes without affecting the others.
+
+I'll demonstrate with a simple Python simulation:
+
+````py
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
+from Crypto.Util.Padding import pad, unpad  # Import padding and unpadding functions
+import os
+
+# Simplified CBC-MAC implementation with padding
+def cbc_mac(message, key, iv):
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    padded_message = pad(message, AES.block_size)  # Apply PKCS#7 padding
+    encrypted_message = cipher.encrypt(padded_message)
+    return encrypted_message[-AES.block_size:]
+
+# Simulating the man-in-the-middle scenario
+def modify_message(message, iv):
+    # Assuming block size of 16, and we want to modify a block
+    modified_block = b'new_content_here'  # Must be 16 bytes
+    # Directly modify a block in the message
+    modified_message = message[:16] + modified_block + message[32:]
+    return modified_message, iv
+
+# Original message
+message = b'from=alice;to=bob;amount=40;'
+key = get_random_bytes(16)
+iv = get_random_bytes(16)
+
+# Generate MAC for the original message
+original_mac = cbc_mac(message, key, iv)
+
+# Modify the message
+modified_message, modified_iv = modify_message(message, iv)
+
+# Generate MAC for the modified message using the same IV
+modified_mac = cbc_mac(modified_message, key, modified_iv)
+
+# Checking if MACs are the same (they won't be in a simple modification)
+print("Original MAC:", original_mac)
+print("Modified MAC:", modified_mac)
+
+````
+![sc2](./sc02.png)
+
+Task 4.2.
+
+If you capture (a), (b), and (a||b) with their CBC-MACs, you can construct new messages by rearranging these blocks. Since CBC-MAC of (a||b) is valid, any message ending with (a||b) will have the same MAC, assuming the IV is chosen correctly or not used for the final MAC validation.
+
+Example Code: For this demonstration, I'll simulate capturing these messages and then show how to forge a new message.
+````py
+    from Crypto.Cipher import AES
+  from Crypto.Random import get_random_bytes
+  from Crypto.Util.Padding import pad  # Import padding function
+  
+  # Basic CBC-MAC function for demonstration
+  def cbc_mac(message, key, iv):
+      cipher = AES.new(key, AES.MODE_CBC, iv)
+      # Pad the message to be a multiple of the block size
+      padded_message = pad(message, AES.block_size)
+      encrypted = cipher.encrypt(padded_message)
+      return encrypted[-AES.block_size:]  # Return the last block as MAC
+  
+  # Generating key and IV
+  key = get_random_bytes(16)  # Assume a 16-byte key for AES
+  iv = get_random_bytes(16)  # Initial IV
+  
+  # Simulated captured messages
+  a = b"Transaction1"
+  b = b"Transaction2"
+  a_b = a + b  # Concatenation of a and b
+  
+  # Generating MACs for these messages
+  mac_a = cbc_mac(a, key, iv)
+  mac_b = cbc_mac(b, key, iv)
+  mac_a_b = cbc_mac(a_b, key, iv)
+  
+  # The idea here is to demonstrate how given a, b, and a||b, one can forge messages.
+  # For simplicity, let's assume we're just showcasing the MACs here without further manipulation.
+  
+  print(f"MAC of a: {mac_a.hex()}")
+  print(f"MAC of b: {mac_b.hex()}")
+  print(f"MAC of a||b: {mac_a_b.hex()}")
+  
+  # Forge a new message by reusing components
+  # Here's how you could theoretically use these components to forge a new message:
+  # If you concatenate b with a (b||a) and adjust the IV accordingly, you can create a scenario
+  # where you manipulate the blocks. However, without the ability to modify the IV in
+  # a meaningful way for this demonstration, we're limited to discussing the concept.
+
+  # The critical point is understanding that if you know the structure of the messages and have
+  # their MACs, you can rearrange components and potentially forge messages if the system
+  # does not adequately verify the integrity or authenticity beyond just checking the MAC.
+````
+![sc3](./sc03.png)
