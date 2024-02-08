@@ -223,4 +223,4 @@ Example Code: For this demonstration, I'll simulate capturing these messages and
   # their MACs, you can rearrange components and potentially forge messages if the system
   # does not adequately verify the integrity or authenticity beyond just checking the MAC.
 ````
-![sc3](./sc03.png)
+![sc3](./sc3.png)
