@@ -73,22 +73,23 @@ In conclusion, while this code demonstrates a specific cryptographic exercise, i
 
 ----
 
-Task 2: Timing attack
+### Task 2: Timing attack
 
-To carry out this timing attack on MAC verification successfully, i'll followed a systematic approach. Timing attacks exploit the fact that cryptographic operations can take different amounts of time to complete, depending on the input data. Using docker image i built up due to enviromental constraint between by machine and the `./authenticator` file, I ran the python script below.
+To carry out this timing attack on MAC verification successfully, I followed a systematic approach. Timing attacks exploit the fact that cryptographic operations can take different amounts of time to complete, depending on the input data. Using docker image i built up due to enviromental constraint between my machine and the `./authenticator` file, I ran the python script below.
 
 The code below performs a timing attack against an authentication system to guess the Message Authentication Code (MAC) of an encrypted message. It consists of two main functions: read_and_encode_ciphertext and timing_attack.
 
-read_and_encode_ciphertext(file_path): This function reads the ciphertext from a file specified by file_path, which is expected to be in binary format. It then encodes this binary data into a base64 string and returns it. The base64 encoding is used because it converts binary data into a text string, which can be easily transmitted or stored in JSON and other text-based formats.
+1. `read_and_encode_ciphertext(file_path)`: This function reads the ciphertext from a file specified by file_path, which is expected to be in binary format. It then encodes this binary data into a base64 string and returns it. The base64 encoding is used because it converts binary data into a text string, which can be easily transmitted or stored in JSON and other text-based formats.
 
-timing_attack(ciphertext_base64, mac_length): This function attempts to guess the MAC by exploiting timing differences in the authentication system's response times. It operates under the assumption that the system will take slightly longer to respond when more bytes of the MAC are correct, due to the way most MAC verification processes work. The function:
+2. `timing_attack(ciphertext_base64, mac_length)`: This function attempts to guess the MAC by exploiting timing differences in the authentication system's response times. It operates under the assumption that the system will take slightly longer to respond when more bytes of the MAC are correct, due to the way most MAC verification processes work. The function:
 
-Iterates through each byte position in the MAC (specified by mac_length).
-For each position, it tries all possible byte values (0-255) and constructs a potential MAC by appending the guessed byte to the best guess so far and padding the rest with zeros.
-For each guess, it creates a JSON payload containing the sender, receiver, the base64-encoded ciphertext, and the current MAC guess. This payload is then passed to an external authenticator binary (specified by authenticator_path) using the subprocess module, which measures the execution time.
-It determines the best guess for each byte position by comparing execution times; the guess with the longest execution time is assumed to be the correct byte for that position.
-The process is repeated until the entire MAC is guessed.
-Finally, it prints the best MAC guess and the timing results for each byte position.
+- Iterates through each byte position in the MAC (specified by mac_length).
+- For each position, it tries all possible byte values (0-255) and constructs a potential MAC by appending the guessed byte to the best guess so far and padding the rest with zeros.
+- For each guess, it creates a JSON payload containing the sender, receiver, the base64-encoded ciphertext, and the current MAC guess. This payload is then passed to an external authenticator binary (specified by authenticator_path) using the subprocess module, which measures the execution time.
+- It determines the best guess for each byte position by comparing execution times; the guess with the longest execution time is assumed to be the correct byte for that position.
+- The process is repeated until the entire MAC is guessed.
+- Finally, it prints the best MAC guess and the timing results for each byte position.
+
 The timing_attack function uses a side-channel attack by analyzing how the execution time varies with different MAC guesses. This type of attack can be effective if the authentication system's response times are correlated with the correctness of the MAC, allowing an attacker to infer the correct MAC without having to break the underlying cryptographic algorithm directly.
 
 ```py
