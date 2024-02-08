@@ -224,3 +224,67 @@ Example Code: For this demonstration, I'll simulate capturing these messages and
   # does not adequately verify the integrity or authenticity beyond just checking the MAC.
 ````
 ![sc3](./sc3.png)
+
+Task 4.3.
+
+Using the same key for CBC-MAC and CBC encryption is insecure. If the receiver accepts only fixed-length messages and uses the same key for both encryption and MAC, an attacker can still manipulate blocks in the encrypted domain without knowing the plaintext.
+
+When using the same key for CBC encryption and CBC-MAC in a fixed-length message scenario, an attacker can exploit the fact that the MAC is calculated on the ciphertext. By manipulating ciphertext blocks, the attacker can alter the plaintext in predictable ways without affecting the MAC, assuming they can control or predict the IV for encryption.
+
+The code simulates an example where an attacker intercepts an encrypted message and its MAC, then modifies the message and forwards it to the receiver. The receiver decrypts the message and checks the MAC, failing to notice the tampering due to the shared key vulnerability.
+
+````py
+  from Crypto.Cipher import AES
+  from Crypto.Random import get_random_bytes
+  
+  # Helper functions
+  def aes_cbc_encrypt(plaintext, key, iv):
+      cipher = AES.new(key, AES.MODE_CBC, iv)
+      return cipher.encrypt(plaintext)
+  
+  def aes_cbc_decrypt(ciphertext, key, iv):
+      cipher = AES.new(key, AES.MODE_CBC, iv)
+      return cipher.decrypt(ciphertext)
+  
+  def cbc_mac(ciphertext, key, iv):
+      cipher = AES.new(key, AES.MODE_CBC, iv)
+      encrypted = cipher.encrypt(ciphertext)
+      return encrypted[-AES.block_size:]  # Return the last block as MAC
+  
+  key = get_random_bytes(16)
+  iv = get_random_bytes(16)
+  
+  # Original plaintext message
+  plaintext = b"Confidential Message"
+  
+  # Encrypt the message
+  ciphertext = aes_cbc_encrypt(plaintext, key, iv)
+  
+  # Generate MAC for the ciphertext
+  mac = cbc_mac(ciphertext, key, iv)
+  
+  # Simulate an attacker modifying the ciphertext
+  # For simplicity, let's flip a bit in the first block of the ciphertext.
+  # This will modify the corresponding plaintext block upon decryption, but not the MAC.
+  modified_ciphertext = bytearray(ciphertext)
+  modified_ciphertext[5] ^= 0x01  # Flipping a bit
+  modified_ciphertext = bytes(modified_ciphertext)
+  
+  # The receiver decrypts the message and checks the MAC
+  received_plaintext = aes_cbc_decrypt(modified_ciphertext, key, iv)
+  received_mac = cbc_mac(modified_ciphertext, key, iv)
+  
+  # Compare MACs
+  mac_match = received_mac == mac
+  
+  print(f"Original plaintext: {plaintext}")
+  print(f"Modified plaintext: {received_plaintext}")
+  print(f"MAC match: {mac_match}")
+  
+  # Output analysis
+  if mac_match:
+      print("The MAC matches, receiver may not notice the modification.")
+  else:
+      print("The MAC does not match, receiver will notice the modification.")
+````
+![sc](./sc4.png)
