@@ -4,7 +4,7 @@
 
 Using Python's `cryptography` library, which supports both GCM (Galois/Counter Mode) and CCM (Counter with CBC-MAC) modes of operation for AES (Advanced Encryption Standard).  GCM would be the used mode due to its wide adoption and performance benefits.
 
-The standard minimum tag length for GCM in most libraries is 12 bytes, but fot tis task i conceptually choose to focus on a shorter part of the tag (e.g., the first 1 or 2 bytes) to illustrate the brute force method. However, it's crucial to understand that in real-world applications, using such a short tag length severely compromises security, making it vulnerable to forgery attacks.
+The standard minimum tag length for GCM in most libraries is 12 bytes, but for this task i conceptually choose to focus on a shorter part of the tag (e.g., the first 1 or 2 bytes) to illustrate the brute force method. However, it's crucial to understand that in real-world applications, using such a short tag length severely compromises security, making it vulnerable to forgery attacks.
 
 First, we'll encrypt a message using AES in GCM mode with a full tag and then simulate the short tag length by considering only the first part of it. Next, we'll attempt to brute force another message that results in the same truncated authentication tag. This involves generating random messages, encrypting them with the same key and nonce, and comparing the generated tag's relevant portion with that of the original message.
 
