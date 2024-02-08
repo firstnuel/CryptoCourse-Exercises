@@ -71,6 +71,99 @@ Results
 In conclusion, while this code demonstrates a specific cryptographic exercise, it's important to highlight that the practices of nonce reuse and relying on shortened tags are not secure and should be avoided in actual cryptographic applications.
 
 
+----
+
+Task 2: Timing attack
+
+To carry out this timing attack on MAC verification successfully, i'll followed a systematic approach. Timing attacks exploit the fact that cryptographic operations can take different amounts of time to complete, depending on the input data. Using docker image i built up due to enviromental constraint between by machine and the `./authenticator` file, I ran the python script below.
+
+The code below performs a timing attack against an authentication system to guess the Message Authentication Code (MAC) of an encrypted message. It consists of two main functions: read_and_encode_ciphertext and timing_attack.
+
+read_and_encode_ciphertext(file_path): This function reads the ciphertext from a file specified by file_path, which is expected to be in binary format. It then encodes this binary data into a base64 string and returns it. The base64 encoding is used because it converts binary data into a text string, which can be easily transmitted or stored in JSON and other text-based formats.
+
+timing_attack(ciphertext_base64, mac_length): This function attempts to guess the MAC by exploiting timing differences in the authentication system's response times. It operates under the assumption that the system will take slightly longer to respond when more bytes of the MAC are correct, due to the way most MAC verification processes work. The function:
+
+Iterates through each byte position in the MAC (specified by mac_length).
+For each position, it tries all possible byte values (0-255) and constructs a potential MAC by appending the guessed byte to the best guess so far and padding the rest with zeros.
+For each guess, it creates a JSON payload containing the sender, receiver, the base64-encoded ciphertext, and the current MAC guess. This payload is then passed to an external authenticator binary (specified by authenticator_path) using the subprocess module, which measures the execution time.
+It determines the best guess for each byte position by comparing execution times; the guess with the longest execution time is assumed to be the correct byte for that position.
+The process is repeated until the entire MAC is guessed.
+Finally, it prints the best MAC guess and the timing results for each byte position.
+The timing_attack function uses a side-channel attack by analyzing how the execution time varies with different MAC guesses. This type of attack can be effective if the authentication system's response times are correlated with the correctness of the MAC, allowing an attacker to infer the correct MAC without having to break the underlying cryptographic algorithm directly.
+
+```py
+import subprocess
+import base64
+import time
+import json
+
+# Function to read the ciphertext from a file and encode it in base64
+def read_and_encode_ciphertext(file_path):
+    with open(file_path, 'rb') as file:
+        ciphertext_binary = file.read()
+    return base64.b64encode(ciphertext_binary).decode('utf-8')
+
+# Function to perform the timing attack, adjusted for any MAC length
+def timing_attack(ciphertext_base64, mac_length):
+    best_tag = ''
+    timing_results = []
+
+    # Path to the authenticator binary
+    authenticator_path = './authenticator'
+
+    # Iterate through each byte of the MAC
+    for position in range(mac_length):
+        best_time = -1
+        best_byte = ''
+        for byte_guess in range(256):
+            # Construct the current tag guess
+            current_tag = best_tag + '{:02x}'.format(byte_guess) + '00' * (mac_length - position - 1)
+            
+            # Prepare the JSON payload
+            json_input = {
+                "sender": "Bob",
+                "receiver": "Alice",
+                "data": ciphertext_base64,
+                "tag": current_tag
+            }
+            
+            # Convert JSON to string and encode for subprocess
+            json_input_str = json.dumps(json_input).encode('utf-8')
+
+            # Measure execution time for the current tag guess
+            start_time = time.time()
+            subprocess.run([authenticator_path, '--json'], input=json_input_str, capture_output=True)
+            elapsed_time = time.time() - start_time
+
+            # Update if this guess has the longest processing time so far
+            if elapsed_time > best_time:
+                best_time = elapsed_time
+                best_byte = '{:02x}'.format(byte_guess)
+
+        # Append the best byte guess for this position to the overall MAC guess
+        best_tag += best_byte
+        timing_results.append((best_byte, best_time))
+
+    print('Best tag:', best_tag)
+    print('Timing results:', timing_results)
+
+# Example usage
+ciphertext_base64 = read_and_encode_ciphertext('./ciphertext.txt')
+mac_length = 16  # Specify the actual MAC length here
+timing_attack(ciphertext_base64, mac_length)
+````
+![sc](./sc5.png)
+
+Output
+- Best tag: 0e16fbab0fc34ad0517fbc4cfe839f1e
+- Timing results: [('0e', 0.0025773048400878906), ('16', 0.0024344921112060547), ('fb', 0.0017218589782714844), ('ab', 0.0036306381225585938), ('0f', 0.0024709701538085938), ('c3', 0.00582122802734375), ('4a', 0.001974344253540039), ('d0', 0.004180431365966797), ('51', 0.0025632381439208984), ('7f', 0.0034112930297851562), ('bc', 0.0018420219421386719), ('4c', 0.0019826889038085938), ('fe', 0.0024194717407226562), ('83', 0.001714944839477539), ('9f', 0.0017566680908203125), ('1e', 0.0021615028381347656)]
+
+- The output indicates that the timing attack has successfully inferred a full MAC tag of length 16 bytes: 0e16fbab0fc34ad0517fbc4cfe839f1e. The timing results for each byte show the elapsed time during the verification process, highlighting the variability in processing times which has been leveraged to guess each byte of the MAC.
+
+Analyzing the Results
+- Variability in Timing: The timing results vary for each byte, with some bytes taking significantly longer to process (c3 with 0.00582122802734375 seconds, d0 with 0.004180431365966797 seconds). These discrepancies in processing time are indicative of the binary's behavior during the MAC verification process, which you've exploited to infer the MAC.
+Success of the Attack: The final MAC tag represents the sequence of bytes that, according to your measurements, maximized the processing time at each position. This suggests that each byte in this sequence is likely to be correct or close to the actual MAC used by the application.
+
 ----- 
 
 ### Task 3: Short cycles in GHASH
@@ -118,6 +211,7 @@ forged_blocks = swap_blocks(blocks, 4, 0)
 nged Tag:", rearranged_tag)
   ````
 In the simulated example, we started with an initial sequence of blocks: ['C1', 'C2', 'C3', 'C4', 'C5']. By exploiting the property of the cycle where \(H^5 = H\), swapping the blocks `C1` and `C5` resulted in a new sequence: ['C5', 'C2', 'C3', 'C4', 'C1']. According to the cycle property described in the provided document, this rearrangement should not change the GHASH value, illustrating a potential forgery scenario.
+
 
 ----
 ### Task 4: Forging CBC-MAC messages
