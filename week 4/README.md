@@ -289,10 +289,9 @@ The code simulates an example where an attacker intercepts an encrypted message 
 ````
 ![sc](./sc4.png)
 
-The code is a good demonstration of trying to exploit the vulnerabilities associated with using the same key for both CBC encryption and CBC-MAC. However, the outcome I observed—where the MAC did not match after the ciphertext was modified—correctly reflects the system's designed response to data tampering. 
+The code is a good demonstration of trying to exploit the vulnerabilities associated with using the same key for both CBC encryption and CBC-MAC. However, the outcome I observed—where the MAC did not match after the ciphertext was modified—correctly reflects the system's designed response to data tampering. Here's a breakdown of why the system behaved as it did and why the MAC did not match:
 
 - Encryption and MAC Calculation: The process began by encrypting the original plaintext message and calculating its Message Authentication Code (MAC). This step established a baseline for integrity verification, ensuring that any modifications to the ciphertext would be detected.
 
-- Modification of the Ciphertext: A bit in the ciphertext was intentionally flipped to simulate tampering with the data. This action altered the content represented by the MAC, highlighting the importance of MACs in detecting unauthorized modifications. Here's a breakdown of why the system behaved as it did and why the MAC did not match:
-
+- Modification of the Ciphertext: A bit in the ciphertext was intentionally flipped to simulate tampering with the data. This action altered the content represented by the MAC, highlighting the importance of MACs in detecting unauthorized modifications. 
 - Integrity Check: Upon receiving the modified ciphertext, the receiver attempted to decrypt it and recalculate the MAC. However, the recalculated MAC did not match the original MAC sent with the message. This discrepancy indicated that the message had been tampered with during transit, allowing the receiver to identify and reject the altered message.
