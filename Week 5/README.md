@@ -17,4 +17,9 @@ Task 1.1
   `openssl pkeyutl -encrypt -inkey public_key.pem -pubin -in message.txt -out encrypted_message.bin`
 
 Task 1.2
-- 
+- [Generated Key(public)](./public_key.pem)
+- Message : "Hello, Emmanuel!"
+- [Generated Signature](./signature.sign)
+- Commands used to generate the signature.
+
+  `openssl dgst -sha256 -sign private_key.pem -out signature.sign message.txt/`
