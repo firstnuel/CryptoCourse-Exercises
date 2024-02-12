@@ -19,6 +19,8 @@ YwIDAQAB`
   `openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048`
   
   `openssl rsa -pubout -in private_key.pem -out public_key.pem`
+
+- [Encrypted Message](./encypted_message.bin)
 - Command used to encrypt message(message was stored in a message.txt file)
 
   `openssl pkeyutl -encrypt -inkey public_key.pem -pubin -in message.txt -out encrypted_message.bin`
