@@ -60,3 +60,15 @@ S/n | Message | Public key(s) | Signature file(s)
 
 
 Task 2.2
+
+The "textbook" RSA (without padding, directly encrypting the message with the private key) is not secure for several reasons:
+
+- No Padding: Textbook RSA does not include padding, which makes it deterministic and susceptible to chosen-plaintext attacks. An attacker could potentially use this determinism to forge signatures on messages that have a predictable structure.
+
+- Replay Attacks: Without a mechanism to ensure the uniqueness of each signed message (like timestamps or sequence numbers), an attacker could reuse a valid signature in a different context.
+
+- Message Recovery: For short messages, textbook RSA allows an attacker to recover the original message from the signature without needing the private key, simply by raising the signature to the power of the public exponent.
+
+- Lack of Integrity Protection: Textbook RSA does not inherently provide integrity protection. An attacker could alter an unsigned portion of a message without affecting the signature's validity.
+
+To mitigate these vulnerabilities, practical RSA implementations use padding schemes (such as PKCS#1 v1.5 or OAEP for encryption, and PSS for signing) and often combine RSA with hash functions to sign the hash of the message rather than the message itself. This approach provides additional security properties, including resistance to chosen-plaintext attacks and ensuring that the operation is not deterministic.
