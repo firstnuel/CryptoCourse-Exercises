@@ -71,4 +71,42 @@ The "textbook" RSA (without padding, directly encrypting the message with the pr
 
 - Lack of Integrity Protection: Textbook RSA does not inherently provide integrity protection. An attacker could alter an unsigned portion of a message without affecting the signature's validity.
 
-To mitigate these vulnerabilities, practical RSA implementations use padding schemes (such as PKCS#1 v1.5 or OAEP for encryption, and PSS for signing) and often combine RSA with hash functions to sign the hash of the message rather than the message itself. This approach provides additional security properties, including resistance to chosen-plaintext attacks and ensuring that the operation is not deterministic.
+- To mitigate these vulnerabilities, practical RSA implementations use padding schemes (such as PKCS#1 v1.5 or OAEP for encryption, and PSS for signing) and often combine RSA with hash functions to sign the hash of the message rather than the message itself. This approach provides additional security properties, including resistance to chosen-plaintext attacks and ensuring that the operation is not deterministic.
+-------
+
+### Task 4: Roll your own public key cryptosystem
+
+Task 4.1
+
+- Hard Problem: The chosen hard problem for this cryptosystem is the **Graph Isomorphism Problem** (GIP). In GIP, the challenge is to determine whether two finite graphs are isomorphic, meaning there is a bijection between the vertex sets of the two graphs that preserves the adjacency relationship.
+
+- Evidence of Hardness: The Graph Isomorphism Problem is considered hard because, despite extensive research, no polynomial-time algorithm has been found for solving it in the general case. Its complexity class is somewhere between P and NP-complete, making it a candidate for cryptographic applications due to its non-deterministic polynomial (NP) hardness for certain instances.
+
+- Usage for Encryption: In this system, the public key would be a graph \(G\) and its isomorphic counterpart \(G'\), where \(G'\) is a scrambled version of \(G\) using a secret transformation. To encrypt a message, the sender uses the public key to map the message onto a series of graph transformations that correspond to \(G'\). The private key, known only to the receiver, can efficiently reverse these transformations, leveraging the specific isomorphism used to create \(G'\) from \(G\).
+
+Task 4.2
+- Pseudocode for Encryption
+````
+def encrypt_message(message, public_key):
+    # Assuming public_key is (G, G'), where G' is an isomorphic graph to G
+    G, G_prime = public_key
+    encrypted_message = []
+
+    for char in message:
+        # Map each character to a transformation in G'
+        transformation = map_char_to_transformation(char, G_prime)
+        encrypted_message.append(transformation)
+
+    return encrypted_message
+
+def map_char_to_transformation(char, graph):
+    # Simplified example of mapping a char to a graph transformation
+    return some_transformation_based_on_char_and_graph(char, graph)
+````
+- Complexity: The complexity of the encryption process depends on the efficiency of mapping characters to graph transformations and the complexity of applying these transformations. It is expected to be polynomial in the size of the message and the graph but may vary based on the specific implementation of the graph isomorphism challenge.
+
+Task 4.3 
+
+- Side-Channel Attacks: If the encryption or decryption process has varying execution times or uses different amounts of resources depending on the input, it may be vulnerable to side-channel attacks that infer information based on these variations.
+- Man-in-the-Middle (MitM) Attacks: Without a secure way of exchanging public keys, an attacker could intercept communications, substituting their own public keys to decrypt and possibly alter messages before re-encrypting and sending them to the intended recipient.
+- Algorithmic Attacks: If a polynomial-time algorithm for GIP is discovered, it would compromise the security of this cryptosystem.
