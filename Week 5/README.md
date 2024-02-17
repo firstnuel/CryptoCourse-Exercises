@@ -110,3 +110,11 @@ Task 4.3
 - Side-Channel Attacks: If the encryption or decryption process has varying execution times or uses different amounts of resources depending on the input, it may be vulnerable to side-channel attacks that infer information based on these variations.
 - Man-in-the-Middle (MitM) Attacks: Without a secure way of exchanging public keys, an attacker could intercept communications, substituting their own public keys to decrypt and possibly alter messages before re-encrypting and sending them to the intended recipient.
 - Algorithmic Attacks: If a polynomial-time algorithm for GIP is discovered, it would compromise the security of this cryptosystem.
+
+Task 4.4
+
+The Graph Isomorphism Problem has been considered for cryptographic applications, notably in a study proposing practical post-quantum signature schemes based on isomorphism problems of trilinear forms. This scheme, inspired by zero-knowledge protocols for graph isomorphism, aims to offer an alternative for post-quantum digital signatures, highlighting the cryptographic potential of isomorphism problems​
+
+Refrences
+- [Practical Post-Quantum Signature Schemes from Isomorphism Problems of Trilinear Forms](https://eprint.iacr.org/2022/267)
+- [The Graph Isomorphism Problem](https://era.library.ualberta.ca/items/f8153faa-71bf-4b64-9eb4-f0c6d3b529dd)
