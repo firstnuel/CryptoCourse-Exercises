@@ -103,7 +103,15 @@ def find_order(public_share, generator, prime):
 order = find_order(public_share, generator, prime)
 print("Order:", order)
 ````
+The output of the code is as follows:
 
+![sc](./sc2.png)
+
+The order is 101. 
+
+- The fact that Alice's share has an order of 101 indicates that there are 101 elements in the subgroup of the group produced by the generator modulo the prime that is made up of all conceivable values for the common shared secret. The order of the subgroup—101 in this case—determines the number of possible values for the common shared secret. As a result, the common shared secret has 101 possible values.
+
+- Bob's options are limited to the 101-element subgroup that Alice's share creates as a potential value for the common shared secret. As a result, regardless of Bob's choice of secret exponent, the number of choices stays the same.
 -----
 ### Task 3: ElGamal & Malleability
 
