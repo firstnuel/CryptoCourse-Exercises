@@ -71,6 +71,38 @@ Modern cryptographic protocols, such as TLS, address the Man-in-the-Middle (MitM
 
 By integrating these and other security measures, modern systems significantly reduce the risk of MitM attacks, ensuring secure communications even over public and potentially insecure channels.
 
+------
+
+### Task 2: DH with a very unsafe prime
+
+2.1 Order of Alice's Share
+
+The order is the smallest \(d\) for which \(A^d \equiv 1 \mod p\).  A straightforward approach to find (d) is a brute-force search from 1 up to p−1, but this can be optimized with knowledge of group theory or using algorithms designed for such purposes.
+
+````py
+# Function to read a value from a file
+def read_value_from_file(file_path):
+    with open(file_path, 'r') as file:
+        return int(file.read().strip())
+
+# Replace these paths with the actual paths to your files
+prime = './unsafe_p.txt'
+generator = './generator.txt'
+public share = './unsafe_ga.txt'
+
+def find_order(public_share, generator, prime):
+    d = 1
+    while True:
+        # Alice's share^d mod p
+        result = pow(public_share, d, prime)
+        if result == 1:
+            return d
+        d += 1
+
+# Order of Alice's share
+order = find_order(public_share, generator, prime)
+print("Order:", order)
+````
 
 -----
 ### Task 3: ElGamal & Malleability
