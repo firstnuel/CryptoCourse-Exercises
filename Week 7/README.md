@@ -1,7 +1,8 @@
+# Week 7: TLS
 
-# TLS Versions, RFCs, and Differences
+### Task 1: Getting to know TLS versions
 
-## 1.1 TLS 1.1
+TLS 1.1
 
 - **RFC 4346**: [https://tools.ietf.org/html/rfc4346](https://tools.ietf.org/html/rfc4346)
 - **Changes from TLS 1.0**:
@@ -10,7 +11,7 @@
   - Defined support for IANA registration of parameters for future use.
 - **Mandatory Cipher Suites (TLS 1.1)**: At this time, there were no officially mandated suites, leading to potential compatibility issues.
 
-## 1.2 TLS 1.2
+TLS 1.2
 
 - **RFC 5246**: [https://tools.ietf.org/html/rfc5246](https://tools.ietf.org/html/rfc5246)
 - **Changes from TLS 1.1**:
@@ -20,7 +21,7 @@
   - Extensions mechanism defined.
 - **Mandatory Cipher Suites (TLS 1.2)**: TLS_RSA_WITH_AES_128_CBC_SHA (later revisions may mandate others)
 
-## 1.3 TLS 1.3
+TLS 1.3
 
 - **RFC 8446**: [https://tools.ietf.org/html/rfc8446](https://tools.ietf.org/html/rfc8446)
 - **Changes from TLS 1.2**:
@@ -32,7 +33,7 @@
   - TLS_AES_256_GCM_SHA384
   - TLS_AES_128_GCM_SHA256
 
-## 1.4 Table of Differences
+### Task 1.2 Table of Differences
 
 | Feature                  | TLS 1.1                           | TLS 1.2                           | TLS 1.3                                         |
 |--------------------------|-----------------------------------|-----------------------------------|-------------------------------------------------|
